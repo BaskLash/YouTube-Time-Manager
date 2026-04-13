@@ -220,14 +220,18 @@ function renderChannels(agg, channels, tags) {
     `;
     container.appendChild(row);
 
-    // Open dropdown on badge click (re-read storage for freshness)
+    // Open dropdown on badge click (re-read storage for freshness).
+    // IMPORTANT: capture the element reference synchronously — e.currentTarget
+    // is reset to null by the browser once the event handler returns, so it
+    // must not be read inside the async .then() callback.
     row.querySelector('.channel-tag-btn').addEventListener('click', e => {
       e.stopPropagation();
+      const btn = e.currentTarget; // capture before any await / .then()
       chrome.storage.local.get(['tags', 'channels']).then(raw => {
         const freshTags     = raw.tags     || {};
         const freshChannels = raw.channels || {};
         const currentTag    = freshChannels[cid]?.tag || null;
-        openTagDropdown(cid, currentTag, freshTags, e.currentTarget);
+        openTagDropdown(cid, currentTag, freshTags, btn);
       });
     });
   }
@@ -256,6 +260,8 @@ function closeDropdown() {
 }
 
 function openTagDropdown(cid, currentTag, tags, badgeBtn) {
+  if (!badgeBtn) return; // element was unmounted before the storage call resolved
+
   closeDropdown();
 
   const tagEntries  = Object.entries(tags);
