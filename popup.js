@@ -191,12 +191,20 @@ function renderChannels(agg, channels, tags) {
 
   container.innerHTML = '';
   for (const [cid, secs] of sorted) {
-    const ch      = channels[cid] || { name: cid, tag: null };
-    const name    = ch.name || cid;
-    const tag     = ch.tag || 'Untagged';
-    const color   = tags[tag]?.color || '#9CA3AF';
-    const initial = name.charAt(0).toUpperCase();
-    const bgColor = avatarColor(name);
+    const ch         = channels[cid] || { name: cid, tag: null };
+    const name       = ch.name || cid;
+    const tag        = ch.tag || null;
+    const isUntagged = !tag;
+    const color      = tag ? (tags[tag]?.color || '#9CA3AF') : null;
+    const initial    = name.charAt(0).toUpperCase();
+    const bgColor    = avatarColor(name);
+
+    // Badge is a button: styled when tagged, dashed call-to-action when not
+    const badgeStyle = isUntagged ? '' : `background:${color}22;color:${color}`;
+    const badgeClass = isUntagged ? 'channel-tag-btn is-untagged' : 'channel-tag-btn';
+    const badgeLabel = isUntagged ? '+ Tag' : tag;
+
+    const chevronSvg = `<svg class="tag-btn-chevron" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
 
     const row = document.createElement('div');
     row.className = 'channel-row';
@@ -204,12 +212,143 @@ function renderChannels(agg, channels, tags) {
       <div class="channel-avatar" style="background:${bgColor}">${initial}</div>
       <div class="channel-info">
         <div class="channel-name">${name}</div>
-        <span class="channel-tag-badge" style="background:${color}22;color:${color}">${tag}</span>
+        <button class="${badgeClass}" style="${badgeStyle}" data-cid="${cid}">
+          ${badgeLabel}${chevronSvg}
+        </button>
       </div>
       <span class="channel-time">${fmtSeconds(secs)}</span>
     `;
     container.appendChild(row);
+
+    // Open dropdown on badge click (re-read storage for freshness)
+    row.querySelector('.channel-tag-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      chrome.storage.local.get(['tags', 'channels']).then(raw => {
+        const freshTags     = raw.tags     || {};
+        const freshChannels = raw.channels || {};
+        const currentTag    = freshChannels[cid]?.tag || null;
+        openTagDropdown(cid, currentTag, freshTags, e.currentTarget);
+      });
+    });
   }
+}
+
+// ── Inline tag dropdown ───────────────────────────────────────
+
+// Palette used when auto-creating a tag from the dropdown input
+const AUTO_COLORS = ['#F97316','#3B82F6','#8B5CF6','#10B981','#F59E0B','#06B6D4','#EF4444','#EC4899'];
+
+function colorForTagName(name) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0xFFFF;
+  return AUTO_COLORS[Math.abs(h) % AUTO_COLORS.length];
+}
+
+let _dropdown        = null;
+let _clickAwayFn     = null;
+let _keyEscFn        = null;
+
+function closeDropdown() {
+  _dropdown?.remove();
+  _dropdown = null;
+  if (_clickAwayFn) { document.removeEventListener('click', _clickAwayFn); _clickAwayFn = null; }
+  if (_keyEscFn)    { document.removeEventListener('keydown', _keyEscFn);  _keyEscFn    = null; }
+}
+
+function openTagDropdown(cid, currentTag, tags, badgeBtn) {
+  closeDropdown();
+
+  const tagEntries  = Object.entries(tags);
+  const hasCategories = tagEntries.length > 0;
+
+  // ── Build dropdown HTML ──
+  let inner = '';
+
+  if (hasCategories) {
+    inner += '<div class="tag-dd-list">';
+    for (const [name, meta] of tagEntries) {
+      const isActive = currentTag === name;
+      const check    = isActive
+        ? `<svg class="tag-dd-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`
+        : '';
+      inner += `<button class="tag-dd-item${isActive ? ' active' : ''}" data-tag="${name}">
+        <span class="tag-dd-dot" style="background:${meta.color}"></span>${name}${check}
+      </button>`;
+    }
+    if (currentTag) {
+      inner += `<div class="tag-dd-divider"></div>
+        <button class="tag-dd-item remove" data-tag="">Remove tag</button>`;
+    }
+    inner += '</div>';
+  } else {
+    inner += `<div class="tag-dd-empty">No categories yet.<br>Type a name to create one.</div>`;
+  }
+
+  inner += `<div class="tag-dd-create">
+    <input class="tag-dd-input" placeholder="${hasCategories ? '+ New category…' : 'Category name…'}" />
+  </div>`;
+
+  // ── Create & position the element ──
+  _dropdown = document.createElement('div');
+  _dropdown.className = 'tag-dropdown';
+  _dropdown.innerHTML = inner;
+  document.body.appendChild(_dropdown);
+
+  // Position below (or above if near the bottom)
+  const rect       = badgeBtn.getBoundingClientRect();
+  const ddHeight   = _dropdown.offsetHeight || 180;
+  const spaceBelow = window.innerHeight - rect.bottom - 8;
+  const top = spaceBelow >= ddHeight
+    ? rect.bottom + 4
+    : rect.top - ddHeight - 4;
+
+  let left = rect.left;
+  const ddWidth = 196;
+  if (left + ddWidth > window.innerWidth - 8) left = window.innerWidth - ddWidth - 8;
+
+  Object.assign(_dropdown.style, { top: top + 'px', left: left + 'px', width: ddWidth + 'px' });
+
+  // ── Wire up existing-category clicks ──
+  _dropdown.querySelectorAll('.tag-dd-item').forEach(btn => {
+    btn.addEventListener('click', () => assignTagToChannel(cid, btn.dataset.tag, badgeBtn));
+  });
+
+  // ── Wire up create-new input ──
+  const input = _dropdown.querySelector('.tag-dd-input');
+  input.focus();
+  input.addEventListener('keydown', async e => {
+    if (e.key === 'Enter') {
+      const name = input.value.trim();
+      if (name) await createAndAssignTag(cid, name, badgeBtn);
+    }
+  });
+
+  // ── Click-away & Escape to close ──
+  setTimeout(() => {
+    _clickAwayFn = e => { if (!_dropdown?.contains(e.target)) closeDropdown(); };
+    _keyEscFn   = e => { if (e.key === 'Escape') closeDropdown(); };
+    document.addEventListener('click',   _clickAwayFn);
+    document.addEventListener('keydown', _keyEscFn);
+  }, 0);
+}
+
+async function assignTagToChannel(cid, tagName, badgeBtn) {
+  closeDropdown();
+  await chrome.runtime.sendMessage({ type: 'SET_CHANNEL_TAG', channelId: cid, tag: tagName });
+  render(currentPeriod); // re-render so category bars update too
+}
+
+async function createAndAssignTag(cid, tagName, badgeBtn) {
+  const raw  = await chrome.storage.local.get('tags');
+  const tags = raw.tags || {};
+
+  // Create tag with auto-color if it doesn't already exist
+  if (!tags[tagName]) {
+    tags[tagName] = { color: colorForTagName(tagName) };
+    await chrome.storage.local.set({ tags });
+  }
+
+  await assignTagToChannel(cid, tagName, badgeBtn);
 }
 
 // ── Main render ──────────────────────────────────────────────
