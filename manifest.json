@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "YouTube Time Manager",
-  "version": "1.0.8",
-  "description": "📽️ **Keep Focused, Stay Productive** Hides video recommendations for a distraction-free YouTube experience.",
+  "version": "2.0.0",
+  "description": "Understand your YouTube habits. Track time, discover patterns, get insights.",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "YouTube Time Manager"
   },
   "icons": {
     "16": "icon/icon16.png",
@@ -17,22 +18,11 @@
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*", "https://youtube.com/*"],
-      "js": [
-        "scripts/hideelements.js",
-        "scripts/hideFeed.js",
-        "scripts/keepPlaylist.js",
-        "scripts/redirectFromURL.js",
-        "scripts/videoRecoGoals.js",
-        "scripts/verifyVideo.js",
-        "scripts/content.js"
-      ]
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ],
-  "permissions": ["storage"],
-  "web_accessible_resources": [
-    {
-      "resources": ["goals.html"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  "options_page": "options.html",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["https://www.youtube.com/*", "https://youtube.com/*"]
 }

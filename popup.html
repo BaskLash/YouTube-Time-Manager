@@ -1,10 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YouTube Time Manager</title>
-  </head>
-  <body>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Time Manager</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-left">
+      <svg class="logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" fill="#FF4444" opacity="0.12"/>
+        <circle cx="12" cy="12" r="10" stroke="#FF4444" stroke-width="1.5"/>
+        <path d="M12 7v5l3 3" stroke="#FF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="header-title">Time Manager</span>
+    </div>
+    <div class="header-actions">
+      <span class="header-date" id="headerDate"></span>
+      <button class="icon-btn" id="openOptions" title="Settings">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Period Tabs ── -->
+  <div class="tabs">
+    <button class="tab active" data-period="today">Today</button>
+    <button class="tab" data-period="week">This Week</button>
+  </div>
+
+  <!-- ── Summary Cards ── -->
+  <div class="cards-row">
+    <div class="card">
+      <div class="card-value" id="totalTime">—</div>
+      <div class="card-label">Watch time</div>
+    </div>
+    <div class="card">
+      <div class="card-value" id="videoCount">—</div>
+      <div class="card-label">Videos</div>
+    </div>
+    <div class="card">
+      <div class="card-value" id="topTagTime">—</div>
+      <div class="card-label" id="topTagLabel">Top category</div>
+    </div>
+  </div>
+
+  <!-- ── Insight Banner ── -->
+  <div class="insight-card" id="insightCard">
+    <svg class="insight-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/>
+    </svg>
+    <span id="insightText">Start watching YouTube to see your insights.</span>
+  </div>
+
+  <!-- ── By Category ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-title">By Category</span>
+      <button class="tag-hint-btn" id="tagHint">+ Tag channels</button>
+    </div>
+    <div class="category-list" id="categoryList">
+      <div class="empty-state">No data yet for this period.</div>
+    </div>
+  </section>
+
+  <!-- ── Top Channels ── -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-title">Top Channels</span>
+    </div>
+    <div class="channel-list" id="channelList">
+      <div class="empty-state">No data yet for this period.</div>
+    </div>
+  </section>
+
+  <!-- ── Footer / Feedback ── -->
+  <footer class="footer">
+    <a class="footer-btn" id="btnGitHub" href="#" title="View on GitHub">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      GitHub
+    </a>
+    <a class="footer-btn" id="btnBug" href="#" title="Report a bug">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 2v2M16 2v2M9 12h6M9 16h4M3 10l2 2M21 10l-2 2M3 18l2-2M21 18l-2-2"/>
+        <rect x="6" y="4" width="12" height="16" rx="2"/>
+      </svg>
+      Report Bug
+    </a>
+    <a class="footer-btn" id="btnFeature" href="#" title="Request a feature">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      Feature
+    </a>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
 </html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Time Manager — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" fill="#FF4444" opacity="0.12"/>
+        <circle cx="12" cy="12" r="10" stroke="#FF4444" stroke-width="1.5"/>
+        <path d="M12 7v5l3 3" stroke="#FF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Time Manager</span>
+    </div>
+
+    <ul class="nav-list">
+      <li><button class="nav-item active" data-view="channels">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Channels
+      </button></li>
+      <li><button class="nav-item" data-view="tags">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+          <line x1="7" y1="7" x2="7.01" y2="7"/>
+        </svg>
+        Categories
+      </button></li>
+      <li><button class="nav-item" data-view="stats">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Weekly Stats
+      </button></li>
+      <li><button class="nav-item" data-view="data">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+        </svg>
+        Data
+      </button></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a class="sidebar-link" id="sidebarGithub" href="#">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        View on GitHub
+      </a>
+      <a class="sidebar-link danger" id="sidebarBug" href="#">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 2v2M16 2v2M9 12h6M3 10l2 2M21 10l-2 2M3 18l2-2M21 18l-2-2"/>
+          <rect x="6" y="4" width="12" height="16" rx="2"/>
+        </svg>
+        Report a Bug
+      </a>
+      <a class="sidebar-link feature" id="sidebarFeature" href="#">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        Request a Feature
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- ── Channels View ── -->
+    <div class="view active" id="view-channels">
+      <div class="view-header">
+        <div>
+          <h1 class="view-title">Channels</h1>
+          <p class="view-sub">Assign categories to channels you've watched. This powers your insights.</p>
+        </div>
+        <input class="search-input" id="channelSearch" placeholder="Search channels…" />
+      </div>
+
+      <div id="channelRows" class="channel-table">
+        <div class="table-empty">No channels tracked yet. Start watching YouTube!</div>
+      </div>
+    </div>
+
+    <!-- ── Tags View ── -->
+    <div class="view" id="view-tags">
+      <div class="view-header">
+        <div>
+          <h1 class="view-title">Categories</h1>
+          <p class="view-sub">Manage the categories you can assign to channels.</p>
+        </div>
+      </div>
+
+      <div class="add-tag-form">
+        <input class="tag-name-input" id="newTagName" placeholder="New category name…" maxlength="24" />
+        <input type="color" class="color-picker" id="newTagColor" value="#6366F1" />
+        <button class="btn btn-primary" id="addTagBtn">Add</button>
+      </div>
+
+      <div id="tagRows" class="tag-list"></div>
+    </div>
+
+    <!-- ── Stats View ── -->
+    <div class="view" id="view-stats">
+      <div class="view-header">
+        <h1 class="view-title">Weekly Stats</h1>
+        <p class="view-sub">Your last 7 days of YouTube usage.</p>
+      </div>
+      <div id="weeklyChart" class="weekly-chart"></div>
+      <div id="weeklyBreakdown" class="weekly-breakdown"></div>
+    </div>
+
+    <!-- ── Data View ── -->
+    <div class="view" id="view-data">
+      <div class="view-header">
+        <h1 class="view-title">Data</h1>
+        <p class="view-sub">Manage your stored tracking data.</p>
+      </div>
+
+      <div class="data-cards">
+        <div class="data-card">
+          <div class="data-card-label">Total videos tracked</div>
+          <div class="data-card-value" id="statVideos">—</div>
+        </div>
+        <div class="data-card">
+          <div class="data-card-label">Days with data</div>
+          <div class="data-card-value" id="statDays">—</div>
+        </div>
+        <div class="data-card">
+          <div class="data-card-label">Channels tracked</div>
+          <div class="data-card-value" id="statChannels">—</div>
+        </div>
+      </div>
+
+      <div class="danger-zone">
+        <div class="danger-title">Danger Zone</div>
+        <div class="danger-row">
+          <div>
+            <div class="danger-label">Clear all tracking data</div>
+            <div class="danger-desc">Removes all watch history, stats, and channel assignments. Your categories are kept.</div>
+          </div>
+          <button class="btn btn-danger" id="clearDataBtn">Clear Data</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Confirm Modal ── -->
+<div class="modal-overlay hidden" id="confirmModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Are you sure?</div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+      <button class="btn btn-danger" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="options.js"></script>
+</body>
+</html>
